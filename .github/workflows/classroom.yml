@@ -1,7 +1,12 @@
 name: GitHub Classroom Workflow
+
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 jobs:
   build:
     name: Autograding
@@ -13,13 +18,69 @@ jobs:
 
       - uses: docker/setup-buildx-action@v2
 
-      # TODO build, publish to docker hub, deploy to k8s
+      - name: set up JDK 17
+        uses: actions/setup-java@v1
+        with:
+            java-version: 17
+            cache: gradle
+            
+      - name: set up gradle
+        uses: gradle/gradle-build-action@v2
+        
+      # Reservation
+      - name: Grant execute permission for gradlew
+        run: cd ReservationApp && chmod +x gradlew
+      - name: Build with Gradle
+        run: cd ReservationApp && ./gradlew build
+        
+      # Loyalty
+      - name: Grant execute permission for gradlew
+        run: cd LoyaltyApp && chmod +x gradlew
+      - name: Build with Gradle
+        run: cd LoyaltyApp && ./gradlew build
+        
+      # Payment
+      - name: Grant execute permission for gradlew
+        run: cd PaymentApp && chmod +x gradlew
+      - name: Build with Gradle
+        run: cd PaymentApp && ./gradlew build
+        
+      # Payment
+      - name: Grant execute permission for gradlew
+        run: cd Gateway && chmod +x gradlew
+      - name: Build with Gradle
+        run: cd Gateway && ./gradlew build
+        
+      - name: Build images
+        timeout-minutes: 10
+        run: docker compose build
+        
+      - name: Login Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          
+      #- name: Push images
+      #  run: |
+      #    cd ./srcipts
+      #    chmod +x create-push-images.sh
+      #    ./create-push-images.sh
+          
+      - name: Deploy to k8s
+        run: |
+          kubectl config set-cluster rsoi-2022-lab4-cluster --server="${{ secrets.KUBE_URL }}" --insecure-skip-tls-verify=true
+          kubectl config set-credentials userRole --token="${{ secrets.KUBE_TOKEN }}"
+          kubectl config set-context default --cluster=rsoi-2022-lab4-cluster --user=userRole
+          kubectl config use-context default
+          helm upgrade --install service-lab4 k8s/rsoi4-chart
+          sleep 45
 
       - name: Run API Tests
         uses: matt-ball/newman-action@master
         with:
-          collection: <variant>/postman/collection.json
-          environment: <variant>/postman/environment.json
+          collection: v2/postman/collection.json
+          environment: v2/postman/environment.json
           delayRequest: 100
           reporters: '[ "cli" ]'
 

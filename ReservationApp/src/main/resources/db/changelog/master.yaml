@@ -1,0 +1,10 @@
+ databaseChangeLog:
+    - include:
+        file: 2022-10-29-create-table-hotels.sql
+        relativeToChangelogFile: true
+    - include:
+        file: 2022-10-29-create-table-reservation.sql
+        relativeToChangelogFile: true
+    - include:
+        file: 2022-11-05-insert-table-hotels.sql
+        relativeToChangelogFile: true

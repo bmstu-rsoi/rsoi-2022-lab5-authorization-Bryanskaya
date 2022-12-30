@@ -1,0 +1,28 @@
+loyalty:
+  service:
+    port: 8050
+    image:
+      name: bryanskaya/loyaltyapp
+      tag: latest
+
+payment:
+  service:
+    port: 8060
+    image:
+      name: bryanskaya/paymentapp
+      tag: latest
+
+reservation:
+  service:
+    port: 8070
+    image:
+      name: bryanskaya/reservationapp
+      tag: latest
+
+gateway:
+  service:
+    port: 8080
+    image:
+      name: bryanskaya/gateway
+      tag: latest
+    isGateway: true
