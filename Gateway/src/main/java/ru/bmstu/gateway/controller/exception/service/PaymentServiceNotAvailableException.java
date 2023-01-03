@@ -1,9 +1,12 @@
 package ru.bmstu.gateway.controller.exception.service;
 
-public class PaymentServiceNotAvailableException extends RuntimeException {
-    public static String MSG = "GATEWAY: Payment service is not available, code=%s.";
+import org.springframework.http.HttpStatus;
+import ru.bmstu.gateway.handler.BaseException;
 
-    public PaymentServiceNotAvailableException(String codeStatus) {
-        super(String.format(MSG, codeStatus));
+public class PaymentServiceNotAvailableException extends BaseException {
+    public static String message = "Payment Service unavailable";
+
+    public PaymentServiceNotAvailableException(HttpStatus codeStatus) {
+        super(message, codeStatus);
     }
 }

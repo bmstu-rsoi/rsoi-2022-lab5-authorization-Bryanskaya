@@ -1,10 +1,13 @@
 package ru.bmstu.gateway.controller.exception.service;
 
 
-public class HotelServiceNotAvailableException extends RuntimeException {
-    public static String MSG = "GATEWAY: Hotel service is not available, code=%s.";
+import org.springframework.http.HttpStatus;
+import ru.bmstu.gateway.handler.BaseException;
 
-    public HotelServiceNotAvailableException(String codeStatus) {
-        super(String.format(MSG, codeStatus));
+public class HotelServiceNotAvailableException extends BaseException {
+    public static String message = "Hotel Service unavailable";
+
+    public HotelServiceNotAvailableException(HttpStatus codeStatus) {
+        super(message, codeStatus);
     }
 }
