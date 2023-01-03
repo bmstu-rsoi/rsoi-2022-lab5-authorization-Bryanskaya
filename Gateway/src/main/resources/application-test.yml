@@ -1,0 +1,24 @@
+host:
+  service:
+    hotel: "reservationapp"
+    loyalty: "loyaltyapp"
+    payment: "paymentapp"
+
+path:
+  service:
+    hotel: "api/v1/hotels"
+    loyalty: "api/v1/loyalty"
+    reservation: "api/v1/reservations"
+    payment: "api/v1/payments"
+
+port:
+  service:
+    hotel: "8070"
+    loyalty: "8050"
+    payment: "8060"
+
+const:
+  jwt:
+    token:
+      validity:
+        seconds: 60
