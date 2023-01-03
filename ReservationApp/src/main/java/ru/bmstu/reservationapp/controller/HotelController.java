@@ -56,6 +56,16 @@ public class HotelController {
     }
 
 
+    @GetMapping(value = "/exists/{hotelUid}", produces = "application/json")
+    public ResponseEntity<HotelResponse> getHotelByUid(@PathVariable UUID hotelUid) {
+        log.info(">>> RESERVATION: Request to get hotel by hotelUid={} was caught.", hotelUid);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(hotelService.getHotelByHotelUid(hotelUid));
+    }
+
+
     @GetMapping(value = "/{hotelUid}/id", produces = "application/json")
     public ResponseEntity<?> getHotelIdByHotelUid(@PathVariable UUID hotelUid) {
         log.info(">>> RESERVATION: Request to get hotelId by hotelUid={} was caught.", hotelUid);
