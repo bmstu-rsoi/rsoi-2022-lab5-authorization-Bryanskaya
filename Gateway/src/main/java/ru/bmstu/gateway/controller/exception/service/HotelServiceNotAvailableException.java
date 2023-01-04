@@ -2,7 +2,7 @@ package ru.bmstu.gateway.controller.exception.service;
 
 
 import org.springframework.http.HttpStatus;
-import ru.bmstu.gateway.handler.BaseException;
+import ru.bmstu.gateway.controller.exception.BaseException;
 
 public class HotelServiceNotAvailableException extends BaseException {
     public static String message = "Hotel Service unavailable";
