@@ -1,4 +1,4 @@
-package ru.bmstu.gateway.handler;
+package ru.bmstu.gateway.controller.exception;
 
 import org.springframework.http.HttpStatus;
 
