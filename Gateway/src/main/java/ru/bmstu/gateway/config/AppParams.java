@@ -27,4 +27,11 @@ public class AppParams {
     public String portLoyalty;
     @Value(value = "${port.service.payment}")
     public String portPayment;
+
+    @Value(value = "${const.jwt.token.validity.seconds}")
+    public Integer jwtTokenValidity;
+    @Value(value = "${const.jwt.token.prefix}")
+    public String jwtPrefix;
+    @Value(value = "${const.jwt.secret}")
+    public String jwtSecret;
 }

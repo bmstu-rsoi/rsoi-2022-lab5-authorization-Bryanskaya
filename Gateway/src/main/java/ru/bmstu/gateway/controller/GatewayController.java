@@ -3,104 +3,100 @@ package ru.bmstu.gateway.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
-import ru.bmstu.gateway.config.AppParams;
-import ru.bmstu.gateway.controller.exception.data.RelatedDataNotFoundException;
 import ru.bmstu.gateway.controller.exception.data.RequestDataErrorException;
-import ru.bmstu.gateway.controller.exception.data.ReservationByUsernameNotFoundException;
-import ru.bmstu.gateway.controller.exception.data.ReservationByUsernameReservationUidNotFoundException;
-import ru.bmstu.gateway.controller.exception.service.*;
 import ru.bmstu.gateway.dto.*;
-import ru.bmstu.gateway.dto.converter.HotelInfoConverter;
-import ru.bmstu.gateway.dto.converter.PaymentConverter;
-import ru.bmstu.gateway.dto.converter.ReservationConverter;
 import ru.bmstu.gateway.service.GatewayService;
+import ru.bmstu.gateway.service.TokenService;
 
-import javax.annotation.Resource;
 import javax.websocket.server.PathParam;
-import java.util.ArrayList;
 import java.util.UUID;
-
-import static ru.bmstu.gateway.dto.converter.UserInfoResponseConverter.createUserInfoResponse;
 
 @Slf4j
 @RestController
 @RequestMapping("api/v1")
 public class GatewayController {
     @Autowired
-    private GatewayService service;
+    private GatewayService gatewayService;
+    @Autowired
+    private TokenService tokenService;
 
 
     @GetMapping(value = "/hotels", produces = "application/json")
-    public ResponseEntity<?> getHotels(@PathParam(value = "page") Integer page,
+    public ResponseEntity<?> getHotels(@RequestHeader(value = "Authorization", required = false) String bearerToken,
+                                       @PathParam(value = "page") Integer page,
                                        @PathParam(value = "size") Integer size) {
         log.info(">>> GATEWAY: Request to get all hotels was caught (params: page={}, size={}).", page, size);
 
-        return service.getHotels(page, size);
+        tokenService.validateToken(bearerToken);
+        return gatewayService.getHotels(page, size);
     }
 
     @GetMapping(value = "/me", produces = "application/json")
-    public ResponseEntity<?> getUserInfo(@RequestHeader(value = "X-User-Name") String username) {
-        log.info(">>> GATEWAY: Request to get all reservations by current username={} was caught.", username);
+    public ResponseEntity<?> getUserInfo(@RequestHeader(value = "Authorization", required = false) String bearerToken) {
+        log.info(">>> GATEWAY: Request to get all reservations by current username was caught.");
 
+        tokenService.validateToken(bearerToken);
         return ResponseEntity
                 .ok()
-                .body(service.getUserInfo(username));
+                .body(gatewayService.getUserInfo(bearerToken));
     }
 
     @GetMapping(value = "/reservations", produces = "application/json")
-    public ResponseEntity<?> getReservationsByUsername(@RequestHeader(value = "X-User-Name") String username) {
-        log.info(">>> GATEWAY: Request to get all reservations by username={} was caught.", username);
+    public ResponseEntity<?> getReservationsByUsername(@RequestHeader(value = "Authorization", required = false) String bearerToken) {
+        log.info(">>> GATEWAY: Request to get all reservations by username was caught.");
 
+        tokenService.validateToken(bearerToken);
         return ResponseEntity
                 .ok()
-                .body(service.getReservationsList(username));
+                .body(gatewayService.getReservationsList(bearerToken));
     }
 
     @GetMapping(value = "/reservations/{reservationUid}", produces = "application/json")
-    public ResponseEntity<?> getReservationByUsernameReservationUid(@RequestHeader(value = "X-User-Name") String username,
+    public ResponseEntity<?> getReservationByUsernameReservationUid(@RequestHeader(value = "Authorization", required = false) String bearerToken,
                                                                     @PathVariable(value = "reservationUid") UUID reservationUid) {
-        log.info(">>> GATEWAY: Request to get all reservations by username={} and reservationUid={} was caught.", username, reservationUid);
+        log.info(">>> GATEWAY: Request to get all reservations by username and reservationUid={} was caught.", reservationUid);
 
+        tokenService.validateToken(bearerToken);
         return ResponseEntity
                 .ok()
-                .body(service.getReservationByUsernameReservationUid(username, reservationUid));
+                .body(gatewayService.getReservationByUsernameReservationUid(bearerToken, reservationUid));
     }
 
     @PostMapping(value = "/reservations")
-    public ResponseEntity<?> postReservation(@RequestHeader(value = "X-User-Name") String username,
+    public ResponseEntity<?> postReservation(@RequestHeader(value = "Authorization", required = false) String bearerToken,
                                              @RequestBody CreateReservationRequest request) {
-        log.info(">>> GATEWAY: Request to create reservation was caught (username={}; data={}).", username, request.toString());
+        log.info(">>> GATEWAY: Request to create reservation was caught (data={}).", request.toString());
+
+        tokenService.validateToken(bearerToken);
 
         if (!request.isValid())
             throw new RequestDataErrorException(request.toString());
 
         return ResponseEntity
                 .ok()
-                .body(service.postReservation(username, request));
+                .body(gatewayService.postReservation(bearerToken, request));
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(value = "/reservations/{reservationUid}", produces = "application/json")
-    public void cancelReservation(@RequestHeader(value = "X-User-Name") String username,
+    public void cancelReservation(@RequestHeader(value = "Authorization", required = false) String bearerToken,
                                   @PathVariable(value = "reservationUid") UUID reservationUid) {
-        log.info(">>> GATEWAY: Request to delete reservation was caught (username={}; reservationUid={}).", username, reservationUid);
+        log.info(">>> GATEWAY: Request to delete reservation was caught (reservationUid={}).", reservationUid);
 
-        service.cancelReservation(username, reservationUid);
+        tokenService.validateToken(bearerToken);
+
+        gatewayService.cancelReservation(bearerToken, reservationUid);
     }
 
     @GetMapping(value = "/loyalty", produces = "application/json")
-    public ResponseEntity<?> getLoyaltyInfoResponseByUsername(@RequestHeader(value = "X-User-Name") String username) {
-        log.info(">>> GATEWAY: Request to get loyalty info by username={} was caught.", username);
+    public ResponseEntity<?> getLoyaltyInfoResponseByUsername(@RequestHeader(value = "Authorization", required = false) String bearerToken) {
+        tokenService.validateToken(bearerToken);
 
         return ResponseEntity
                 .ok()
-                .body(service.getLoyaltyInfoResponseByUsername(username));
+                .body(gatewayService.getLoyaltyInfoResponseByUsername(bearerToken));
     }
 }

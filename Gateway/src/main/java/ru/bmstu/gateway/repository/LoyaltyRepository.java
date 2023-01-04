@@ -5,7 +5,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Repository;
-import ru.bmstu.gateway.controller.exception.data.LoyaltyServiceUnauthorizedException;
+import ru.bmstu.gateway.controller.exception.data.token.UnauthorizedException;
 import ru.bmstu.gateway.controller.exception.service.GatewayErrorException;
 import ru.bmstu.gateway.controller.exception.service.LoyaltyServiceNotAvailableException;
 import ru.bmstu.gateway.dto.LoyaltyInfoResponse;
@@ -13,7 +13,7 @@ import ru.bmstu.gateway.dto.LoyaltyInfoResponse;
 @Slf4j
 @Repository
 public class LoyaltyRepository extends BaseRepository {
-    public LoyaltyInfoResponse getLoyaltyInfoResponseByUsername(String username) {
+    public LoyaltyInfoResponse getLoyaltyInfoResponseByUsername(String bearerToken) {
         return webClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -22,10 +22,10 @@ public class LoyaltyRepository extends BaseRepository {
                         .port(appParams.portLoyalty)
                         .build())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .header("X-User-Name", username)
+                .header("Authorization", bearerToken)
                 .retrieve()
                 .onStatus(HttpStatus.UNAUTHORIZED::equals, error -> {
-                    throw new LoyaltyServiceUnauthorizedException(error.statusCode());
+                    throw new UnauthorizedException(error.statusCode());
                 })
                 .onStatus(HttpStatus::isError, error -> {
                     throw new LoyaltyServiceNotAvailableException(error.statusCode());
@@ -34,7 +34,7 @@ public class LoyaltyRepository extends BaseRepository {
                 .block();
     }
 
-    public Integer getUserStatus(String username) {
+    public Integer getUserStatus(String bearerToken) {
         return webClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -43,7 +43,7 @@ public class LoyaltyRepository extends BaseRepository {
                         .port(appParams.portLoyalty)
                         .build())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .header("X-User-Name", username)
+                .header("Authorization", bearerToken)
                 .retrieve()
                 .onStatus(HttpStatus::isError, error -> {
                     throw new LoyaltyServiceNotAvailableException(error.statusCode());
@@ -77,7 +77,7 @@ public class LoyaltyRepository extends BaseRepository {
                 .block();
     }
 
-    public LoyaltyInfoResponse updateReservationCount(String username) {
+    public LoyaltyInfoResponse updateReservationCount(String bearerToken) {
         return webClient
                 .post()
                 .uri(uriBuilder -> uriBuilder
@@ -86,7 +86,7 @@ public class LoyaltyRepository extends BaseRepository {
                         .port(appParams.portLoyalty)
                         .build())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .header("X-User-Name", username)
+                .header("Authorization", bearerToken)
                 .retrieve()
                 .onStatus(HttpStatus::isError, error -> {
                     throw new LoyaltyServiceNotAvailableException(error.statusCode());
@@ -98,7 +98,7 @@ public class LoyaltyRepository extends BaseRepository {
                 .block();
     }
 
-    public LoyaltyInfoResponse cancelLoyalty(String username) {
+    public LoyaltyInfoResponse cancelLoyalty(String bearerToken) {
         return webClient
                 .delete()
                 .uri(uriBuilder -> uriBuilder
@@ -107,7 +107,7 @@ public class LoyaltyRepository extends BaseRepository {
                         .port(appParams.portLoyalty)
                         .build())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .header("X-User-Name", username)
+                .header("Authorization", bearerToken)
                 .retrieve()
                 .onStatus(HttpStatus::isError, error -> {
                     throw new LoyaltyServiceNotAvailableException(error.statusCode());

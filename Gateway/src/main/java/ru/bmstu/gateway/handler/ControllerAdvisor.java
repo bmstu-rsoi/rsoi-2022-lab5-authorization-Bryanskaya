@@ -4,7 +4,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import ru.bmstu.gateway.controller.exception.BaseException;
 import ru.bmstu.gateway.controller.exception.data.*;
+import ru.bmstu.gateway.controller.exception.data.token.JwtEmptyException;
+import ru.bmstu.gateway.controller.exception.data.token.JwtParsingException;
+import ru.bmstu.gateway.controller.exception.data.token.TokenExpiredException;
+import ru.bmstu.gateway.controller.exception.data.token.UnauthorizedException;
 import ru.bmstu.gateway.controller.exception.service.*;
 
 @ControllerAdvice
@@ -14,7 +19,10 @@ public class ControllerAdvisor {
             LoyaltyServiceNotAvailableException.class,
             PaymentServiceNotAvailableException.class,
             ReservationServiceNotAvailableException.class,
-            LoyaltyServiceUnauthorizedException.class})
+            UnauthorizedException.class,
+            TokenExpiredException.class,
+            JwtParsingException.class,
+            JwtEmptyException.class})
     public ResponseEntity<?> handleHotelServiceNotAvailableException(BaseException ex) {
         Error err = new Error()
                 .setCode(ex.code)

@@ -15,7 +15,7 @@ import java.util.UUID;
 @Slf4j
 @Repository
 public class ReservationRepository extends BaseRepository{
-    public ReservationDTO[] getReservationsArrByUsername(String username) {
+    public ReservationDTO[] getReservationsArrByUsername(String bearerToken) {
         return webClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -24,7 +24,7 @@ public class ReservationRepository extends BaseRepository{
                         .port(appParams.portHotel)
                         .build())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .header("X-User-Name", username)
+                .header("Authorization", bearerToken)
                 .retrieve()
                 .onStatus(HttpStatus::isError, error -> {
                     throw new ReservationServiceNotAvailableException(error.statusCode());
@@ -36,7 +36,7 @@ public class ReservationRepository extends BaseRepository{
                 .block();
     }
 
-    public ReservationDTO getReservationByUsernameReservationUid(String username, UUID reservationUid) {
+    public ReservationDTO getReservationByUsernameReservationUid(String bearerToken, UUID reservationUid) {
         return webClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -45,7 +45,7 @@ public class ReservationRepository extends BaseRepository{
                         .port(appParams.portHotel)
                         .build(reservationUid))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .header("X-User-Name", username)
+                .header("Authorization", bearerToken)
                 .retrieve()
                 .onStatus(HttpStatus::isError, error -> {
                     throw new ReservationServiceNotAvailableException(error.statusCode());
@@ -57,7 +57,7 @@ public class ReservationRepository extends BaseRepository{
                 .block();
     }
 
-    public Integer getReservationFullPrice(String username, CreateReservationRequest request) {
+    public Integer getReservationFullPrice(String bearerToken, CreateReservationRequest request) {
         return webClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -68,7 +68,7 @@ public class ReservationRepository extends BaseRepository{
                         .queryParam("endDate", request.getEndDate())
                         .build(request.getHotelUid()))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .header("X-User-Name", username)
+                .header("Authorization", bearerToken)
                 .retrieve()
                 .onStatus(HttpStatus::isError, error -> {
                     throw new ReservationServiceNotAvailableException(error.statusCode());
@@ -80,7 +80,7 @@ public class ReservationRepository extends BaseRepository{
                 .block();
     }
 
-    public void cancelReservation(String username, UUID reservationUid) {
+    public void cancelReservation(String bearerToken, UUID reservationUid) {
         webClient
                 .delete()
                 .uri(uriBuilder -> uriBuilder
@@ -89,7 +89,7 @@ public class ReservationRepository extends BaseRepository{
                         .port(appParams.portHotel)
                         .build(reservationUid))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .header("X-User-Name", username)
+                .header("Authorization", bearerToken)
                 .retrieve()
                 .onStatus(HttpStatus::isError, error -> {
                     throw new ReservationServiceNotAvailableException(error.statusCode());

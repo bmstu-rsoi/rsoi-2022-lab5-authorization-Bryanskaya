@@ -59,7 +59,7 @@ public class PaymentRepository extends BaseRepository {
                 .block();
     }
 
-    public ReservationDTO postReservation(String username, ReservationDTO reservationDTO) {
+    public ReservationDTO postReservation(String bearerToken, ReservationDTO reservationDTO) {
         return webClient
                 .post()
                 .uri(uriBuilder -> uriBuilder
@@ -68,7 +68,7 @@ public class PaymentRepository extends BaseRepository {
                         .port(appParams.portHotel)
                         .build())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .header("X-User-Name", username)
+                .header("Authorization", bearerToken)
                 .body(BodyInserters.fromValue(reservationDTO))
                 .retrieve()
                 .onStatus(HttpStatus::isError, error -> {

@@ -2,10 +2,11 @@ package ru.bmstu.gateway.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import ru.bmstu.gateway.controller.exception.data.LoyaltyServiceUnauthorizedException;
+import ru.bmstu.gateway.controller.exception.data.token.UnauthorizedException;
 import ru.bmstu.gateway.controller.exception.data.RelatedDataNotFoundException;
 import ru.bmstu.gateway.controller.exception.data.ReservationByUsernameNotFoundException;
 import ru.bmstu.gateway.controller.exception.data.ReservationByUsernameReservationUidNotFoundException;
@@ -14,10 +15,7 @@ import ru.bmstu.gateway.dto.*;
 import ru.bmstu.gateway.dto.converter.HotelInfoConverter;
 import ru.bmstu.gateway.dto.converter.PaymentConverter;
 import ru.bmstu.gateway.dto.converter.ReservationConverter;
-import ru.bmstu.gateway.repository.HotelRepository;
-import ru.bmstu.gateway.repository.LoyaltyRepository;
-import ru.bmstu.gateway.repository.PaymentRepository;
-import ru.bmstu.gateway.repository.ReservationRepository;
+import ru.bmstu.gateway.repository.*;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -28,6 +26,9 @@ import static ru.bmstu.gateway.dto.converter.UserInfoResponseConverter.createUse
 @Service
 @RequiredArgsConstructor
 public class GatewayService {
+    @Autowired
+    private final TokenRepository tokenRepository;
+
     private final LoyaltyRepository loyaltyRepository;
     private final HotelRepository hotelRepository;
     private final ReservationRepository reservationRepository;
@@ -38,31 +39,30 @@ public class GatewayService {
         return hotelRepository.getHotels(page, size);
     }
 
-    public UserInfoResponse getUserInfo(String username) {
-        ArrayList<ReservationResponse> reservationResponseList = getReservationsList(username);
+    public UserInfoResponse getUserInfo(String bearerToken) {
+        ArrayList<ReservationResponse> reservationResponseList = getReservationsList(bearerToken);
 
         LoyaltyInfoResponse loyaltyInfoResponse;
         try {
-            loyaltyInfoResponse = getLoyaltyInfoResponseByUsername(username);
-        } catch (LoyaltyServiceUnauthorizedException e) {
+            loyaltyInfoResponse = getLoyaltyInfoResponseByUsername(bearerToken);
+        } catch (UnauthorizedException e) {
             throw e;
         } catch (Exception e)
         {
-            log.info("----------- {}", e.getClass());
             loyaltyInfoResponse = new LoyaltyInfoResponse();
         }
 
         return createUserInfoResponse(reservationResponseList, loyaltyInfoResponse);
     }
 
-    public LoyaltyInfoResponse getLoyaltyInfoResponseByUsername(String username) {
-        return loyaltyRepository.getLoyaltyInfoResponseByUsername(username);
+    public LoyaltyInfoResponse getLoyaltyInfoResponseByUsername(String bearerToken) {
+        return loyaltyRepository.getLoyaltyInfoResponseByUsername(bearerToken);
     }
 
-    public ArrayList<ReservationResponse> getReservationsList(String username) {
-        ReservationDTO[] reservationArr = reservationRepository.getReservationsArrByUsername(username);
+    public ArrayList<ReservationResponse> getReservationsList(String bearerToken) {
+        ReservationDTO[] reservationArr = reservationRepository.getReservationsArrByUsername(bearerToken);
         if (reservationArr == null)
-            throw new ReservationByUsernameNotFoundException(username);
+            throw new ReservationByUsernameNotFoundException(tokenRepository.getUsername(bearerToken));
 
         ArrayList<ReservationResponse> reservationResponseList = new ArrayList<>();
         for (ReservationDTO reservation: reservationArr)
@@ -91,23 +91,24 @@ public class GatewayService {
                 fromHotelResponseToHotelInfo(hotelRepository.getHotelResponseByHotelId(hotelId));
     }
 
-    public ReservationResponse getReservationByUsernameReservationUid(String username, UUID reservationUid) {
-        ReservationDTO reservation = reservationRepository.getReservationByUsernameReservationUid(username, reservationUid);
+    public ReservationResponse getReservationByUsernameReservationUid(String bearerToken, UUID reservationUid) {
+        ReservationDTO reservation = reservationRepository.getReservationByUsernameReservationUid(bearerToken, reservationUid);
         if (reservation == null)
-            throw new ReservationByUsernameReservationUidNotFoundException(username, reservationUid);
+            throw new ReservationByUsernameReservationUidNotFoundException(tokenRepository.getUsername(bearerToken),
+                                                                            reservationUid);
 
         return _getReservationResponse(reservation);
     }
 
-    public CreateReservationResponse postReservation(String username, CreateReservationRequest request) {
+    public CreateReservationResponse postReservation(String bearerToken, CreateReservationRequest request) {
         HotelResponse hotelResponse = hotelRepository.getHotelResponseByHotelUid(request.getHotelUid());
 
-        Integer reservationPrice = _getReservationPrice(username, request);
+        Integer reservationPrice = _getReservationPrice(bearerToken, request);
         PaymentDTO paymentDTO = paymentRepository.postPayment(reservationPrice);
 
         LoyaltyInfoResponse loyaltyInfoResponse;
         try {
-            loyaltyInfoResponse = loyaltyRepository.updateReservationCount(username);
+            loyaltyInfoResponse = loyaltyRepository.updateReservationCount(bearerToken);
         } catch (LoyaltyServiceNotAvailableException e1) {
             loyaltyInfoResponse = null;
         } catch (Exception e1) {
@@ -124,7 +125,7 @@ public class GatewayService {
 
         ReservationDTO reservationDTO;
         try {
-            reservationDTO = paymentRepository.postReservation(username, ReservationConverter.toReservationDTO(paymentDTO, request,
+            reservationDTO = paymentRepository.postReservation(bearerToken, ReservationConverter.toReservationDTO(paymentDTO, request,
                     hotelRepository.getHotelIdByHotelUid(request.getHotelUid())));
         } catch (Exception e) {
             reservationDTO = null;
@@ -137,21 +138,22 @@ public class GatewayService {
                         PaymentConverter.fromPaymentDTOToPaymentInfo(paymentDTO));
     }
 
-    private Integer _getReservationPrice(String username, CreateReservationRequest request) {
-        Integer reservationPrice = reservationRepository.getReservationFullPrice(username, request);
-        Integer discount = loyaltyRepository.getUserStatus(username);
+    private Integer _getReservationPrice(String bearerToken, CreateReservationRequest request) {
+        Integer reservationPrice = reservationRepository.getReservationFullPrice(bearerToken, request);
+        Integer discount = loyaltyRepository.getUserStatus(bearerToken);
         return loyaltyRepository.getReservationUpdatedPrice(reservationPrice, discount);
     }
 
-    public void cancelReservation(String username, UUID reservationUid) {
-        reservationRepository.cancelReservation(username, reservationUid);
+    public void cancelReservation(String bearerToken, UUID reservationUid) {
+        reservationRepository.cancelReservation(bearerToken, reservationUid);
 
-        ReservationDTO reservationDTO = reservationRepository.getReservationByUsernameReservationUid(username, reservationUid);
+        ReservationDTO reservationDTO = reservationRepository.getReservationByUsernameReservationUid(bearerToken,
+                                                    reservationUid);
         if (reservationDTO == null) return;
 
         paymentRepository.cancelPayment(reservationDTO.getPaymentUid());
 
-        loyaltyRepository.cancelLoyalty(username);
+        loyaltyRepository.cancelLoyalty(bearerToken);
     }
 }
 
