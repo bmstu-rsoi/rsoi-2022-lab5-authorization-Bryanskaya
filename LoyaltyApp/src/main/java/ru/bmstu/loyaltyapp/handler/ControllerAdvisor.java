@@ -4,17 +4,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import ru.bmstu.loyaltyapp.exception.BaseException;
-import ru.bmstu.loyaltyapp.exception.data.jwtToken.JwtEmptyException;
-import ru.bmstu.loyaltyapp.exception.data.jwtToken.JwtParsingException;
-import ru.bmstu.loyaltyapp.exception.data.jwtToken.TokenExpiredException;
-import ru.bmstu.loyaltyapp.exception.data.jwtToken.UnauthorizedException;
+import ru.bmstu.loyaltyapp.exception.data.jwtToken.*;
 
 @ControllerAdvice
 public class ControllerAdvisor {
     @ExceptionHandler({
             JwtParsingException.class,
             TokenExpiredException.class,
-            JwtEmptyException.class})
+            JwtEmptyException.class,
+            KeyFactoryErrorException.class})
     public ResponseEntity<?> handleWrongDataException(BaseException ex) {
         Error err = new Error()
                 .setCode(ex.code)

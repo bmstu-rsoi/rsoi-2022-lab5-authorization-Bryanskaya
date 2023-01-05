@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 public class AppParams {
     @Value(value = "${const.jwt.token.prefix}")
     public String jwtPrefix;
-    @Value(value = "${const.jwt.secret}")
-    public String jwtSecret;
+    @Value(value = "${const.jwt.modulus}")
+    public String modulus;
+    @Value(value = "${const.jwt.exponent}")
+    public String exponent;
 }

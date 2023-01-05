@@ -1,6 +1,7 @@
 package ru.bmstu.loyaltyapp.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import static ru.bmstu.loyaltyapp.service.converter.LoyaltyConverter.fromLoyalty
 import static ru.bmstu.loyaltyapp.service.converter.LoyaltyConverter.fromLoyaltyEntityToLoyaltyDTO;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LoyaltyServiceImpl implements LoyaltyService {
