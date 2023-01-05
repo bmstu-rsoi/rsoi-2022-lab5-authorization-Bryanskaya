@@ -23,12 +23,12 @@
       "enabled": true
     },
     {
-      "key": "client_id",
+      "key": "clientId",
       "value": "0oa7ujznkyNadST0V5d7",
       "enabled": true
     },
     {
-      "key": "client_secret",
+      "key": "clientSecret",
       "value": "4yHab2OuzxisjrnL0At-paOBNTpoVzyjkKS51U1O",
       "enabled": true
     }
