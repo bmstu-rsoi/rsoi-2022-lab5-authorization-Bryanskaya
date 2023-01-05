@@ -61,11 +61,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
           
-      #- name: Push images
-      #  run: |
-      #    cd ./srcipts
-      #    chmod +x create-push-images.sh
-      #    ./create-push-images.sh
+      - name: Push images
+        run: |
+          cd ./srcipts
+          chmod +x create-push-images.sh
+          ./create-push-images.sh
           
       - name: Deploy to k8s
         run: |
