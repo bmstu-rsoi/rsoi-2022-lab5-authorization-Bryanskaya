@@ -24,6 +24,12 @@ public class GatewayController {
     private TokenService tokenService;
 
 
+//    @GetMapping(value = "/callback")
+//    public ResponseEntity<?> callback(Principal principal){
+//        return ResponseEntity
+//                .ok("Hello, world!");
+//    }
+
     @GetMapping(value = "/hotels", produces = "application/json")
     public ResponseEntity<?> getHotels(@RequestHeader(value = "Authorization", required = false) String bearerToken,
                                        @PathParam(value = "page") Integer page,

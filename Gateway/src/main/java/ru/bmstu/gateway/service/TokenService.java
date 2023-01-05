@@ -6,8 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import ru.bmstu.gateway.controller.exception.data.token.JwtEmptyException;
 import ru.bmstu.gateway.controller.exception.data.token.TokenExpiredException;
-import ru.bmstu.gateway.dto.TokenRequest;
-import ru.bmstu.gateway.dto.TokenResponse;
 import ru.bmstu.gateway.repository.LoyaltyRepository;
 import ru.bmstu.gateway.repository.TokenRepository;
 
@@ -21,9 +19,6 @@ public class TokenService {
     @Autowired
     private LoyaltyRepository loyaltyRepository;
 
-    public TokenResponse generateToken(TokenRequest tokenRequest) {
-        return tokenRepository.generateToken(tokenRequest);
-    }
 
     public boolean isExpired(String token) {
         Date expirationDate = tokenRepository.getExpirationDate(token);
