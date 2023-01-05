@@ -4,32 +4,32 @@
   "values": [
     {
       "key": "serviceUrl",
-      "value": "",
+      "value": "http://158.160.44.211",
       "enabled": true
     },
     {
       "key": "identityProviderUrl",
-      "value": "",
+      "value": "https://dev-21530061.okta.com/oauth2/default",
       "enabled": true
     },
     {
       "key": "username",
-      "value": "",
+      "value": "testMax@yandex.ru",
       "enabled": true
     },
     {
       "key": "password",
-      "value": "",
+      "value": "83qmJMha",
       "enabled": true
     },
     {
       "key": "clientId",
-      "value": "",
+      "value": "0oa7ujznkyNadST0V5d7",
       "enabled": true
     },
     {
       "key": "clientSecret",
-      "value": "",
+      "value": "4yHab2OuzxisjrnL0At-paOBNTpoVzyjkKS51U1O",
       "enabled": true
     }
   ],
