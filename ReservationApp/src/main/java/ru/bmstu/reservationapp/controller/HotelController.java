@@ -21,16 +21,10 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping({"api/v1/hotels", ""})
+@RequestMapping("api/v1/hotels")
 public class HotelController {
     private final HotelService hotelService;
 
-    @GetMapping(value = "/manage/health", produces = "application/json")
-    public ResponseEntity<?> isAlive() {
-        return ResponseEntity
-                .ok()
-                .build();
-    }
 
     @GetMapping(value = "/all", produces = "application/json")
     public ResponseEntity<PaginationResponse> getHotels(@PathParam(value = "page") Integer page,

@@ -5,3 +5,10 @@ spring:
     url: jdbc:h2:mem:testdb
     username: sa
     password:
+
+const:
+  jwt:
+    token:
+      prefix: "Bearer "
+    modulus: ""
+    exponent: ""
