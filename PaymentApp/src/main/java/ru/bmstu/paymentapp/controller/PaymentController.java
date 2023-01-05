@@ -14,16 +14,10 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping({"api/v1/payments", ""})
+@RequestMapping("api/v1/payments")
 public class PaymentController {
     private final PaymentService paymentService;
 
-    @GetMapping(value = "/manage/health", produces = "application/json")
-    public ResponseEntity<?> isAlive() {
-        return ResponseEntity
-                .ok()
-                .build();
-    }
 
     @GetMapping(value = "/{paymentUid}", produces = "application/json")
     public ResponseEntity<?> getPaymentByUid(@PathVariable UUID paymentUid) {
