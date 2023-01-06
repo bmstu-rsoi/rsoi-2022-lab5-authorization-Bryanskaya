@@ -1,35 +1,35 @@
 {
   "id": "acc90f86-88ad-444e-924e-6f48f6ee7711",
-  "name": "[rsoi][lab5] Flight Service",
+  "name": "[rsoi][lab5] Hotel Service",
   "values": [
     {
       "key": "serviceUrl",
-      "value": "",
+      "value": "http://158.160.44.211",
       "enabled": true
     },
     {
       "key": "identityProviderUrl",
-      "value": "",
+      "value": "https://dev-21530061.okta.com/oauth2/default",
       "enabled": true
     },
     {
       "key": "username",
-      "value": "",
+      "value": "testMax@yandex.ru",
       "enabled": true
     },
     {
       "key": "password",
-      "value": "",
+      "value": "83qmJMha",
       "enabled": true
     },
     {
       "key": "clientId",
-      "value": "",
+      "value": "0oa7ujznkyNadST0V5d7",
       "enabled": true
     },
     {
       "key": "clientSecret",
-      "value": "",
+      "value": "4yHab2OuzxisjrnL0At-paOBNTpoVzyjkKS51U1O",
       "enabled": true
     }
   ],

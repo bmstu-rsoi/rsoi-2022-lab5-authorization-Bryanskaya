@@ -1,0 +1,15 @@
+spring:
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/master.yaml
+  datasource:
+    url: jdbc:postgresql://postgres-chart-service:5432/reservations
+    username: program
+    password: test
+
+const:
+  jwt:
+    token:
+      prefix: "Bearer "
+    modulus: "nlY3eb4Wxl1Zlb2_eTpbwabiNm1oyaxAzl1BcgHIR_piwxkd02nHDgbFX3SogoAcsEaGXgI7e4j-JwjfHFN74gpdWWcaUrRz9Utt3Dzl-8gVBG2a3_1fgsSgi5ArF5OTYpsFEvQWNYzu6T-pH9EHxNElbc9Ak3rQKIbPqUIGowMVnpyefuZOgsPN6AJ9zuIKIu5p-3Hi2dRPlZmJwZPu3ZpoDsY4HhdrqKuujBf5X0zw4NVugaYkUKUUQc9t5wZfId1kwPpapK-9roOIcvv1tKCB4Z5SLMB9cvgMY4RuWc3NQ_DrQCBc1KYOcmL54Tfwn7vUuVq3SYXYQF3iZZvdOw"
+    exponent: "AQAB"
